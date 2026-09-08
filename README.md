@@ -61,6 +61,7 @@ Everything numeric in this artifact is **computed in your browser at load time a
 | Module 2 compute-flow diagrams (arc mesh vs. converging arrows) | **Illustration of a compute pattern, driven by real arithmetic** | The arc/arrow layout is generated from the slider value `n` via a deterministic layout function (not random/animated for its own sake), and the two counters (`n(n-1)/2` comparisons vs. `n` updates) are computed live from that same `n`. Clicking a token reports how many comparisons involve it — also computed, not scripted. It does not replay real attention weights; it depicts *which pairs get compared*, which the live sandbox in Module 7 then computes for real. |
 | Module 3 key–query–value diagram | **Teaching illustration** | Hand-authored SVG of the retrieval idea: a query compared against stored keys, the closest key returning its paired value. The interactive fact-lab beside it is a scripted teaching example; the live numeric-vector version is Module 7. |
 | Module 9 architecture family tree | **Illustrative / structural** | Hand-authored SVG. Branch structure reflects design intent, not a citation graph or a chronology. Carries the explicit caveats that BDH is not an SSM in the Mamba sense, and that BDH-GPU is a separate ReLU-low-rank formulation using linear attention. |
+| Module 2 compute-flow diagrams (arc mesh vs. converging arrows) | **Illustration of a compute pattern, driven by real arithmetic** | The arc/arrow layout is generated from the slider value `n` via a deterministic layout function (not random/animated for its own sake), and the two counters (`n(n-1)/2` comparisons vs. `n` updates) are computed live from that same `n`. It does not replay real attention weights — it depicts *which pairs get compared*, which the live sandbox in Module 7 then computes for real. |
 | Module 9 trade-off landscape map (SVG scatter of approaches) | **Qualitative / illustrative — explicitly labeled** | Ordinal positioning based on each cited paper's stated design goal and mechanism. It is **not** a benchmark plot with measured numbers, and the panel says so directly. BDH-CQ is deliberately left off this plot (with a note explaining why) rather than forcing an apples-to-oranges comparison. |
 | Module 8 neuron–synapse Hebbian diagram | **Conceptual illustration, explicitly labeled** | A hand-built, simplified rendering of BDH's neuron–synapse framing (sparse activity, Hebbian strengthening) to make the outer-product write concrete. It is not a visualization of activations from a trained checkpoint. The panel states the real reported sparsity (~5% active) versus the diagram's simplified 2-of-20 (10%). |
 | KaTeX equation rendering | **Live**, third-party library | KaTeX 0.16.9 loaded from cdnjs, MIT-licensed. A small script (bottom of the file) calls `katex.render` on every `.imath[data-tex]` element and on the two equation cards. |
@@ -105,13 +106,12 @@ All five are reproduced with full citations in-page under "Primary sources" at t
 
 No third-party images, icons, illustrations, or trained model weights are used anywhere in this artifact.
 
-→ **The authoritative, component-by-component record is [`SOURCES_AND_LICENSES.md`](SOURCES_AND_LICENSES.md).** The table above is a summary; that file governs if the two ever disagree.
-
 ## AI assistance disclosure
 
-Significant portions of this artifact's code, copy, and interaction design were produced with AI assistance (Claude, via the Claude Code CLI), working from the primary sources listed above and from the DataForge Pathway track brief. AI assistance was used for the live simulation JavaScript, all interactive diagrams, the performance work, the prose, this README, and the concept summary. Four of the five paper citations were verified programmatically against local PDF copies.
-
-→ **The full disclosure, including what was verified and what was not, is [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md).**
+Significant portions of this artifact's code, copy, and interaction design were produced with AI assistance (Claude, via Claude Code), working from the primary sources listed above and from the DataForge Pathway track brief. Specifically, AI assistance was used for:
+- Drafting and iterating the JavaScript for the live retrieval simulation, chart/heatmap rendering, and the new interactive diagrams (compute-flow comparison, trade-off landscape map, neuron–synapse illustration).
+- Drafting prose and equation labels, which were then checked against the cited papers for accuracy.
+- Structural/CSS refactoring and accessibility passes (glossary tooltips, scroll progress, reduced-motion handling).
 
 The registered team is responsible for understanding, defending, and being able to modify every component and claim in this artifact, per the track's AI-assistance and technical-ownership requirements. Anyone extending this file should verify new or modified numeric claims against the cited primary sources before publishing them.
 
@@ -126,33 +126,12 @@ There is nothing to install. Everything runs client-side:
 
 No GPU, no dataset download, no API keys.
 
-To regenerate the concept summary PDF from its source (requires Python with Playwright installed):
-
-```python
-from playwright.sync_api import sync_playwright
-with sync_playwright() as p:
-    b = p.chromium.launch(); pg = b.new_page()
-    pg.goto("file:///<absolute path>/concept_summary.html")
-    pg.pdf(path="concept_summary.pdf", print_background=True, prefer_css_page_size=True)
-    b.close()
-```
-
-## Performance notes
-
-The interactive dashboard responds within a single animation frame. Two things make that true, and they are worth knowing if you modify the code:
-
-- **The accuracy curve is cached per state size `d`.** Computing it costs ~96 ms at `d=64` (19 sample points, each an O(N²·d) retrieval sweep). It depends only on `d` — `evalAccuracy` draws its own facts per trial and ignores the N and similarity sliders, which only move the marker line — so it is computed once per `d` and redrawn cheaply thereafter. If a state size has not been seen yet, the nearest cached curve is drawn dimmed with a "recomputing" note while the real one is computed after a 130 ms settle.
-- **Slider events are coalesced to one update per animation frame** via `requestAnimationFrame`, so dragging cannot queue a backlog of recomputations. A full `update()` at N=150 measures ~6.6 ms.
-
 ## Known gaps (in progress, disclosed rather than hidden)
 
-Still outstanding against the full Pathway track checklist:
-
-- **Public artifact URL.** The artifact still needs to be deployed somewhere it opens without sign-in (GitHub Pages on this repository is the obvious route). Until that exists, the submission has a source repository but no public artifact link.
-- **Direct citations into the Dragon Hatchling paper and the BDH-CQ technical report.** The BDH module currently follows the DataForge Pathway track brief's descriptions of BDH's mechanisms rather than citing page/equation references in the primary papers, because local copies of those two papers were not available. This should be tightened before final submission — it is the single weakest evidentiary link in the package.
-- **Verification of the Zoology citation (arXiv:2312.04927).** Four of the five cited papers were verified directly against local PDFs; this one was not. Confirm the identifier and venue.
-- **Team name in `LICENSE`.** Currently attributed to the repository owner handle with a placeholder note; replace with the registered team name.
-
-Completed since the first draft of this README: the one-page concept summary PDF, the standalone source/license record, the standalone AI disclosure, and an MIT `LICENSE`.
+This submission package is not yet complete against the full Pathway track checklist. Specifically, still outstanding:
+- **One-page concept summary PDF** (500–950 words, required deliverable) — not yet written.
+- **Local primary-source copies / direct citations for the Dragon Hatchling paper and BDH-CQ technical report** — the BDH module currently relies on the track brief's description of BDH's mechanisms rather than a direct page/equation citation into those two papers; this should be tightened before final submission.
+- **A separate source-and-license record file** consolidating the table above, and a standalone AI-assistance/data/asset disclosure file (currently folded into this README) — the track brief asks for these as identifiable items in the submission package.
+- **Public hosting** — this file currently lives in a local git repository; it still needs to be pushed to a public repo and deployed to a URL that opens without sign-in.
 
 Flagging these explicitly rather than presenting the package as finished.
