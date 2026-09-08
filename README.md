@@ -4,6 +4,18 @@
 
 **Open the artifact:** `linear_attention_story.html` — a single static HTML file. Double-click it, or open it in any browser. No build step, no server, no sign-in, no network calls except loading KaTeX from a CDN (the artifact still runs if that fails; only equation typesetting degrades).
 
+### What's in this repository
+
+| File | What it is |
+|---|---|
+| `linear_attention_story.html` | **The artifact.** Self-contained interactive explainer, 11 modules. |
+| `concept_summary.pdf` | The required one-page concept summary. ~1,400 words, two-column A4, single page. This is above the track's "approximately 500–950 words" recommendation — kept to one page as required, with a "why this matters now" section and a methodology section added for density; trim if a strict word cap turns out to matter more than page count. |
+| `concept_summary.html` | Source for the PDF above, kept so the PDF is reproducible. |
+| `README.md` | This file: claim, audience, objectives, architecture, evidence labelling, reproduction. |
+| `SOURCES_AND_LICENSES.md` | Source and license record for all code, data, graphics, fonts, and reused components. |
+| `AI_DISCLOSURE.md` | AI assistance, code, data, and asset disclosure, plus citation-verification results. |
+| `LICENSE` | MIT license for the original work in this repository. |
+
 ---
 
 ## The one-sentence claim
@@ -46,6 +58,9 @@ Everything numeric in this artifact is **computed in your browser at load time a
 | Step-through write/read walkthrough, per-token heatmap and KV-cache list (Module 7) | **Live** | Same underlying facts and math, stepped one token at a time. |
 | Module 8 write-granularity toggle and its accuracy/table | **Live**, but explicitly a **toy reimplementation** | A synthetic additive-memory simulation on small vectors — not BDH-CQ's trained weights or its general learned update `Uθ`. Labeled as such in the panel. |
 | Module 1 memory-game animation (card stack vs. state cells) | **Teaching illustration** | Deterministic scripted animation to build intuition before any computation is shown. Labeled "Play 4 facts," not claimed as a live model run. |
+| Module 2 compute-flow diagrams (arc mesh vs. converging arrows) | **Illustration of a compute pattern, driven by real arithmetic** | The arc/arrow layout is generated from the slider value `n` via a deterministic layout function (not random/animated for its own sake), and the two counters (`n(n-1)/2` comparisons vs. `n` updates) are computed live from that same `n`. Clicking a token reports how many comparisons involve it — also computed, not scripted. It does not replay real attention weights; it depicts *which pairs get compared*, which the live sandbox in Module 7 then computes for real. |
+| Module 3 key–query–value diagram | **Teaching illustration** | Hand-authored SVG of the retrieval idea: a query compared against stored keys, the closest key returning its paired value. The interactive fact-lab beside it is a scripted teaching example; the live numeric-vector version is Module 7. |
+| Module 9 architecture family tree | **Illustrative / structural** | Hand-authored SVG. Branch structure reflects design intent, not a citation graph or a chronology. Carries the explicit caveats that BDH is not an SSM in the Mamba sense, and that BDH-GPU is a separate ReLU-low-rank formulation using linear attention. |
 | Module 2 compute-flow diagrams (arc mesh vs. converging arrows) | **Illustration of a compute pattern, driven by real arithmetic** | The arc/arrow layout is generated from the slider value `n` via a deterministic layout function (not random/animated for its own sake), and the two counters (`n(n-1)/2` comparisons vs. `n` updates) are computed live from that same `n`. It does not replay real attention weights — it depicts *which pairs get compared*, which the live sandbox in Module 7 then computes for real. |
 | Module 9 trade-off landscape map (SVG scatter of approaches) | **Qualitative / illustrative — explicitly labeled** | Ordinal positioning based on each cited paper's stated design goal and mechanism. It is **not** a benchmark plot with measured numbers, and the panel says so directly. BDH-CQ is deliberately left off this plot (with a note explaining why) rather than forcing an apples-to-oranges comparison. |
 | Module 8 neuron–synapse Hebbian diagram | **Conceptual illustration, explicitly labeled** | A hand-built, simplified rendering of BDH's neuron–synapse framing (sparse activity, Hebbian strengthening) to make the outer-product write concrete. It is not a visualization of activations from a trained checkpoint. The panel states the real reported sparsity (~5% active) versus the diagram's simplified 2-of-20 (10%). |

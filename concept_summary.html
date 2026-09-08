@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Linear Attention — One-Page Concept Summary</title>
+<style>
+  @page { size: A4; margin: 8mm 10mm; }
+  *{box-sizing:border-box;}
+  body{
+    font-family:"Charter","Iowan Old Style","Palatino Linotype",Georgia,serif;
+    font-size:7.6pt; line-height:1.17; color:#15181c; margin:0;
+  }
+  h1{font-size:12.6pt;margin:0 0 2pt;line-height:1.14;}
+  .sub{font-size:7.6pt;color:#555c63;margin:0 0 2pt;}
+  .meta{font-size:6.9pt;color:#6b727a;margin:0 0 5pt;padding-bottom:3.5pt;border-bottom:1px solid #c8cdd2;}
+  h2{font-size:8.3pt;margin:4pt 0 1.4pt;color:#0b3d38;letter-spacing:.01em;break-after:avoid;}
+  p{margin:0 0 2.4pt;text-align:justify;orphans:2;widows:2;}
+  .cols{column-count:2;column-gap:12pt;column-rule:1px solid #d7dce0;}
+  .full{column-span:all;}
+  .claim{background:#f2f7f6;border-left:2.5pt solid #0b6b60;padding:3.5pt 6pt;margin:3pt 0 4pt;}
+  .claim b{color:#0b3d38;}
+  table{width:100%;border-collapse:collapse;font-size:6.8pt;margin:2pt 0 4pt;
+    font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;}
+  th{text-align:left;background:#eef2f4;border-bottom:1px solid #b9c0c6;padding:2pt 3pt;font-size:6.6pt;color:#2b3238;}
+  td{border-bottom:1px solid #dde2e6;padding:2pt 3pt;vertical-align:top;color:#23282d;}
+  td:first-child{font-weight:600;white-space:nowrap;}
+  .eq{font-family:"Cambria Math",Georgia,serif;font-style:italic;}
+  .refs{font-size:6.8pt;color:#3d444b;line-height:1.28;
+    font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;}
+  .refs li{margin-bottom:0.8pt;}
+  ol{margin:2pt 0 0;padding-left:10pt;}
+  .foot{margin-top:4pt;padding-top:3.5pt;border-top:1px solid #c8cdd2;font-size:6.7pt;color:#6b727a;
+    font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;}
+</style>
+</head>
+<body>
+
+<h1>Linear Attention: buying a memory that stops growing, and paying for it in recall</h1>
+<p class="sub">One-page concept summary · DataForge 2026, Pathway Track · companion to the interactive explainer <i>Where Memory Breaks</i></p>
+<p class="meta">For a data scientist meeting linear attention for the first time. Prerequisites: dot products, matrix–vector multiplication, and the standard query/key/value view of attention.</p>
+
+<div class="cols">
+
+<h2>The design pressure</h2>
+<p>A Transformer scores each query against every earlier token: attention costs <span class="eq">O(T²d)</span> time and, at inference, forces the model to retain every key and value it has ever produced in a KV cache that costs <span class="eq">O(Td)</span> and grows for as long as the conversation runs <span class="refs">[1]</span>. At a 100K-token context — no longer unusual in deployed systems — that cache alone can dwarf the model's own parameters in memory footprint. Linear attention removes the all-pairs comparison by reordering the computation: instead of comparing token pairs, it carries one fixed-size state that each token updates additively, <span class="eq">S ← S + φ(k<sub>t</sub>) ⊗ v<sub>t</sub></span>, and answers a query by reading <span class="eq">r(q) = φ(q)<sup>⊤</sup>S</span>. Per-token cost becomes constant in sequence length, and the state has the same shape after ten tokens as after ten million. This is the mechanism, not merely a metaphor: our companion artifact runs both update rules on identical synthetic key/value streams so the trade-off below is something a reader watches happen, not just reads about.</p>
+
+<h2>Why this matters now</h2>
+<p>This is not a settled, textbook trade-off — it is being actively re-litigated in 2024–2026. Production systems now advertise context windows of hundreds of thousands to millions of tokens, making KV-cache memory a direct, dollar-denominated serving cost rather than a theoretical concern. That pressure is why four substantial papers in the last two years attack the same fixed-state failure mode from different angles: recall-throughput balancing <span class="refs">[1]</span>, gated selective updates shipping in a production model <span class="refs">[4]</span>, associative-memory reformulations of attention <span class="refs">[3]</span>, and provably-bounded state norms <span class="refs">[2]</span>. A concept that mattered only in theory five years ago is now a line item in inference cost.</p>
+
+<h2>What the change costs</h2>
+<p>The state is a superposition: every association is summed into the same matrix, so nothing is stored separately. Probing it with the key that wrote a fact returns that fact <em>plus</em> a weighted sum of every other stored value:</p>
+<div class="claim">
+<span class="eq">r(k<sub>i</sub>) = (k<sub>i</sub><sup>⊤</sup>k<sub>i</sub>)v<sub>i</sub> &nbsp;+&nbsp; Σ<sub>j≠i</sub> (k<sub>i</sub><sup>⊤</sup>k<sub>j</sub>)v<sub>j</sub></span><br>
+<b>The central claim our explainer teaches:</b> a fixed-shape state can absorb an unbounded stream of key–value facts, but because all writes are superposed, retrieval degrades as facts accumulate or as keys grow more similar — and enlarging the state postpones that failure rather than removing it.
+</div>
+<p>The geometry is simple: a key's dot product with itself grows with dimension <span class="eq">d</span>, while its dot product with an unrelated key grows only with <span class="eq">√d</span> for random vectors — the "self-signal" dominates when facts are few and well-separated, but the sum of many small cross-terms eventually rivals it. Arora et al. identify this as a direct state-size/recall trade-off and show fixed-state alternatives such as H3, Mamba and RWKV "struggle at recall"; their BASED architecture makes state size a dial traversing the recall–memory Pareto frontier, beating comparable sub-quadratic models by 10.36 accuracy points on recall-intensive tasks <span class="refs">[1]</span>. Pandey &amp; Singh sharpen the cause: the state grows as <span class="eq">O(T)</span> in Frobenius norm, "causing progressive interference between stored associations" <span class="refs">[2]</span>. Zhong et al. formalise the same separation as a retrieval signal-to-noise ratio under an associative-memory reading of attention <span class="refs">[3]</span>. This is the specific, falsifiable mechanism a reader should demand before accepting any "fixed memory, same quality" claim.</p>
+
+<h2 class="full">Four responses, and what each gives up</h2>
+<div class="full">
+<table>
+  <thead><tr><th>Approach</th><th>Memory rule</th><th>Recall behaviour</th><th>Evidence level</th></tr></thead>
+  <tbody>
+    <tr><td>Softmax attention</td><td>Keeps every key–value pair; grows with context.</td><td>Exact — the reference mechanism. Cost, not accuracy, is the problem.</td><td>Ubiquitous production use.</td></tr>
+    <tr><td>State-space models<br>(Mamba family)</td><td>Fixed-size recurrent state via a different, SSM-specific recurrence, not an attention rewrite.</td><td>Efficient, but reported to "struggle at recall" relative to attention-based models.</td><td>Author-reported benchmarks <span class="refs">[1]</span>; not the same mechanism family as BDH-GPU (see below).</td></tr>
+    <tr><td>Linear attention<br>(kernel / normalized)</td><td>One fixed state, additive writes; feature map and denominator control scale.</td><td>Degrades once stored pairs exceed state capacity; normalization controls magnitude, not interference.</td><td>Author-reported benchmarks, incl. MQAR <span class="refs">[1]</span>.</td></tr>
+    <tr><td>Gated DeltaNet</td><td>Fixed state; gating erases while the delta rule targets updates, so a write can edit rather than merely add.</td><td>Surpasses Mamba2 and DeltaNet on in-context retrieval, length extrapolation, long-context understanding.</td><td>Author benchmarks, ICLR 2025 <span class="refs">[4]</span>; separately <em>reported</em> in Qwen3-Next — a deployment signal, not an independent evaluation.</td></tr>
+    <tr><td>Variational linear attention</td><td>Fixed state; update recast as regularised online least squares with a Sherman–Morrison rank-1 penalty.</td><td>Cuts ‖S<sub>t</sub>‖<sub>F</sub> 109× at T=1,000; near-exact MQAR while pairs &lt; head dimension; 62% at that boundary.</td><td>Proofs plus author-run experiments, 2026 preprint; no independent replication yet <span class="refs">[2]</span>.</td></tr>
+    <tr><td>BDH-CQ contextual memory</td><td>Recurrent state updated by a <em>learned</em> function, once per demonstration rather than per token.</td><td>Adaptation happens in recurrent state, not weights — no parameter updates at inference.</td><td>Developer-reported.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Where BDH and BDH-CQ actually fit</h2>
+<p>Relevance is real but unequal. <b>BDH</b> (Dragon Hatchling) reformulates attention as synaptic memory: reasoning and memory share one computational fabric, associations are written by Hebbian updates between co-active neurons — "cells that fire together, wire together" made literal as a memory write — and activity is sparse and non-negative, roughly 5% of neurons active in reported runs, varying with input predictability rather than a fixed budget. Its GPU-oriented formulation, BDH-GPU, is built from ReLU-low-rank transformations <em>with</em> linear attention — the direct link to this concept — and is explicitly not a state-space model in the Mamba sense. This also touches an open problem the track brief names directly: consolidating useful <em>fast</em> state, the kind this toy accumulates, into durable <em>slow</em> parameters, versus treating it as disposable per-session memory.</p>
+<p><b>BDH-CQ</b> is the closer case. Its contextual memory is a general learned update <span class="eq">S<sub>t</sub> ← U<sub>θ</sub>(S<sub>t−1</sub>, D<sub>t</sub>)</span>, and its report relates that memory to attention, fast-weight and linear-attention views of contextual association through an <em>additive special case</em> where state accumulates additively per demonstration. That special case — only that — is what our explainer reimplements, as a labelled synthetic toy on random vectors. We do not run BDH-CQ weights, do not claim <span class="eq">U<sub>θ</sub></span> is additive in general, and the artifact says so where a reader could otherwise conflate the two.</p>
+
+<h2>The most important open question</h2>
+<p>Not whether gating or regularisation helps — both demonstrably do — but whether <em>any</em> fixed-size state can hold what a long-context task requires without growing the state or smuggling exact storage back in through a side channel (a sliding window, a retrieval index, a hybrid layer). Both leading fixes concede the capacity boundary rather than dissolve it: VLA's accuracy holds while stored pairs stay below the per-head dimension and drops to 62% at that boundary <span class="refs">[2]</span>, and BASED's own answer is explicitly a hybrid — linear <em>plus</em> sliding-window attention, state size left as a tunable knob rather than a solved constant <span class="refs">[1]</span>. Independent reproduction is the missing evidence throughout: the 2026 variational and BDH/BDH-CQ results are, as of writing, reported by their own authors, not yet replicated externally.</p>
+
+<h2>How the artifact makes this checkable</h2>
+<p>The companion explainer runs both retrieval mechanisms live, on identical synthetic key/value streams (10-value vocabulary, random Gaussian keys, no learned projections), and lets the reader move three real variables — fact count, state size, key similarity — while accuracy, a live Frobenius-norm readout, and a per-query signal-vs-cross-talk breakdown update within one frame. "Reshuffle" redraws a fresh seed so a sceptical reader can confirm the numbers are computed, not replayed. The claim above is falsifiable in under a minute: shrink the state, grow the fact count, and watch linear retrieval fall away from softmax's while the state's norm climbs — or fail to, which would falsify it.</p>
+
+</div>
+
+<h2>Continue here</h2>
+<ol class="refs">
+  <li>Arora, Eyuboglu, Zhang, et al. <i>Simple linear attention language models balance the recall-throughput tradeoff</i> (BASED). arXiv:2402.18668, 2024.</li>
+  <li>Pandey &amp; Singh. <i>Variational Linear Attention: Stable Associative Memory for Long-Context Transformers</i>. arXiv:2605.11196, 2026.</li>
+  <li>Zhong, Xu, Ao &amp; Shi (ByteDance Seed). <i>Understanding Transformer from the Perspective of Associative Memory</i>. arXiv:2505.19488, 2025.</li>
+  <li>Yang, Kautz &amp; Hatamizadeh. <i>Gated Delta Networks: Improving Mamba2 with Delta Rule</i>. arXiv:2412.06464, ICLR 2025.</li>
+  <li>Arora et al. <i>Zoology: Measuring and Improving Recall in Efficient Language Models</i>. arXiv:2312.04927, ICLR 2024 — origin of the MQAR task our explainer runs live.</li>
+  <li>Pathway. <i>The Dragon Hatchling</i> and the <i>BDH-CQ</i> technical report — primary sources for the BDH claims above.</li>
+</ol>
+
+<p class="foot">Live computation only; no precomputed tables. Every illustrative or animated element in the companion artifact is labelled as such, separately from what is live, in the artifact and its README.</p>
+
+</body>
+</html>

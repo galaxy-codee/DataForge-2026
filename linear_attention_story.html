@@ -21,6 +21,30 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--ink);color:var(--text);}
+  html{scroll-behavior:smooth;scroll-padding-top:24px;}
+
+  /* Interaction affordances: every control gives immediate visual feedback. */
+  button,input[type=range],a{transition:transform .12s ease,border-color .15s ease,color .15s ease,background .15s ease;}
+  button:active{transform:translateY(1px) scale(.985);}
+  button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{
+    outline:2px solid var(--teal);outline-offset:2px;border-radius:4px;
+  }
+  input[type=range]{cursor:grab;padding:6px 0;}
+  input[type=range]:active{cursor:grabbing;}
+  input[type=range]::-webkit-slider-thumb{transition:transform .12s ease,box-shadow .12s ease;}
+  input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.15);box-shadow:0 0 0 5px rgba(95,201,189,.16);}
+  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.25);box-shadow:0 0 0 7px rgba(95,201,189,.22);}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--teal);border:2px solid var(--ink);cursor:pointer;}
+
+  /* back to top */
+  #backToTop{
+    position:fixed;right:20px;bottom:20px;z-index:40;background:rgba(22,26,31,.92);backdrop-filter:blur(8px);
+    border:1px solid var(--panel-line);color:var(--muted);font:inherit;font-size:12.5px;padding:9px 13px;
+    border-radius:999px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease,border-color .15s ease,color .15s ease;
+    transform:translateY(8px);
+  }
+  #backToTop.show{opacity:1;pointer-events:auto;transform:translateY(0);}
+  #backToTop:hover{border-color:var(--teal);color:var(--teal);}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
     line-height:1.55;
@@ -181,6 +205,17 @@
   }
   .gloss:hover::after,.gloss:focus::after,.gloss.open::after{opacity:1;transform:translateY(0);}
   .gloss:hover::before,.gloss:focus::before,.gloss.open::before{opacity:1;}
+  /* On narrow screens an absolutely-positioned 230px popover pushes the page wider than the
+     viewport. Pin it to the bottom of the screen instead: fixed elements add no scroll width,
+     and the definition is guaranteed to be fully readable rather than half off-screen. */
+  @media (max-width:700px){
+    .gloss::after{position:fixed;left:12px;right:12px;bottom:14px;width:auto;max-width:none;
+      z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+    .gloss::before{display:none;}
+  }
+  /* Guard against any stray horizontal scroll. `clip` rather than `hidden` so the
+     sticky lesson-goal pin keeps working. */
+  body{overflow-x:clip;}
 
   /* scroll reveal */
   section.reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
@@ -415,6 +450,14 @@
   .model-svg{width:100%;height:auto;background:#0c0e11;border:1px solid var(--panel-line);border-radius:8px}.model-svg text{font-family:ui-monospace,monospace;font-size:12px;fill:#e9e6df}.model-svg .small{font-size:10px;fill:#9aa1a8}.model-svg .box{fill:#161a1f;stroke:#262b31;stroke-width:1.5}.model-svg .state{stroke:#5fc9bd}.model-svg .value{stroke:#e3a75c}.model-svg .flow{fill:none;stroke:#5fc9bd;stroke-width:2;stroke-dasharray:6 6;animation:flowDash 1.2s linear infinite}.model-svg .read{stroke:#e3a75c}.model-svg .pulse-dot{fill:#e3a75c;animation:dotPulse 1.1s ease-in-out infinite}@keyframes flowDash{to{stroke-dashoffset:-24}}@keyframes dotPulse{50%{r:8;opacity:.45}}
   .heb-fire{transform-box:fill-box;transform-origin:center;animation:hebFire .45s ease;}
   @keyframes hebFire{0%{transform:scale(1);}40%{transform:scale(1.7);}100%{transform:scale(1);}}
+  /* interactive landscape points */
+  /* Labels must never swallow pointer events meant for the markers underneath. */
+  #module-compare svg text,#flowSoftmaxSvg text,#flowLinearSvg text{pointer-events:none;}
+  .lp{cursor:pointer;transition:stroke-width .15s ease,r .15s ease;}
+  .lp:hover,.lp:focus,.lp.sel{stroke-width:3.5;}
+  .landscape-readout{margin-top:12px;background:#111418;border:1px solid var(--panel-line);border-left:3px solid var(--teal);
+    border-radius:0 7px 7px 0;padding:12px 15px;font-size:13px;color:var(--muted);line-height:1.55;min-height:64px;}
+  .landscape-readout b{color:var(--text);}
   .plain-recap{background:#111418;border:1px solid var(--teal-dim);border-radius:8px;padding:13px 16px;margin-top:14px;}
   .plain-recap b.tag{display:inline-block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);border:1px solid var(--teal-dim);border-radius:999px;padding:2px 8px;margin-bottom:8px;}
   .plain-recap p{margin:0;font-size:13.5px;color:var(--text);line-height:1.55;}
@@ -431,6 +474,7 @@
 <body>
 <div id="ambient" aria-hidden="true"><canvas id="ambientCanvas"></canvas></div>
 <div id="readProgress" aria-hidden="true"></div>
+<button id="backToTop" type="button" aria-label="Back to the top of the lesson">↑ Top</button>
 <div class="wrap">
 
   <nav class="lesson-nav" aria-label="Lesson progress">
