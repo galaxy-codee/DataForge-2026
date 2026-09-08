@@ -9,7 +9,7 @@
 | File | What it is |
 |---|---|
 | `linear_attention_story.html` | **The artifact.** Self-contained interactive explainer, 11 modules. |
-| `concept_summary.pdf` | The required one-page concept summary (958 words, A4, single page). |
+| `concept_summary.pdf` | The required one-page concept summary. ~1,400 words, two-column A4, single page. This is above the track's "approximately 500–950 words" recommendation — kept to one page as required, with a "why this matters now" section and a methodology section added for density; trim if a strict word cap turns out to matter more than page count. |
 | `concept_summary.html` | Source for the PDF above, kept so the PDF is reproducible. |
 | `README.md` | This file: claim, audience, objectives, architecture, evidence labelling, reproduction. |
 | `SOURCES_AND_LICENSES.md` | Source and license record for all code, data, graphics, fonts, and reused components. |
