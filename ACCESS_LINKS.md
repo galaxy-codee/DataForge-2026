@@ -1,6 +1,6 @@
 # Access links
 
-Submission: **Where Memory Breaks — Linear Attention vs. Softmax Attention** · DataForge 2026, Pathway Track.
+Submission: **Where Memory Breaks — Linear Attention vs. Softmax Attention** · DataForge 2026, Pathway Track
 
 Everything below opens in a normal browser tab. Nothing requires sign-in, an account, or a download to view.
 
