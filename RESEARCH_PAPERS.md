@@ -1,6 +1,6 @@
 # Research papers used
 
-Submission: **Where Memory Breaks — Linear Attention vs. Softmax Attention** · DataForge 2026, Pathway Track.
+Submission: **Where Memory Breaks — Linear Attention vs. Softmax Attention** · DataForge 2026, Pathway Track
 
 Seven papers ground the claims made in the artifact and concept summary. Five are recent primary sources (2022–2026) cited directly beside the technical claims they support; two are Pathway's own BDH/BDH-CQ publications, cited for the module that connects this lesson to BDH-CQ's contextual memory. No text, figures, or tables from any of these are reproduced — all claims are restated in original wording with the source attached.
 
