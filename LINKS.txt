@@ -1,0 +1,11 @@
+DataForge 2026 — Pathway Track submission
+"Where Memory Breaks — Linear Attention vs. Softmax Attention"
+
+PUBLIC ARTIFACT URL (opens without sign-in):
+https://galaxy-codee.github.io/DataForge-2026/linear_attention_story.html
+
+PUBLIC SOURCE CODE REPOSITORY:
+https://github.com/galaxy-codee/DataForge-2026
+
+Both links must be live before this package is submitted — see README.md
+for the file that documents everything else in this checklist item by item.
