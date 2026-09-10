@@ -4,6 +4,22 @@
 
 **Open the artifact:** `linear_attention_story.html` — a single static HTML file. Double-click it, or open it in any browser. No build step, no server, no sign-in, no network calls except loading KaTeX from a CDN (the artifact still runs if that fails; only equation typesetting degrades).
 
+## Deliverable links (all public, no sign-in required)
+
+| Deliverable | Link |
+|---|---|
+| **Artifact** (live, hosted) | [linear_attention_story.html](https://galaxy-codee.github.io/DataForge-2026/linear_attention_story.html) |
+| **Concept summary** (live, hosted) | [concept_summary.html](https://galaxy-codee.github.io/DataForge-2026/concept_summary.html) |
+| **Concept summary** (PDF) | [concept_summary.pdf](https://github.com/galaxy-codee/DataForge-2026/blob/main/concept_summary.pdf) |
+| **Source repository** | [github.com/galaxy-codee/DataForge-2026](https://github.com/galaxy-codee/DataForge-2026) |
+| **Research papers used** | [RESEARCH_PAPERS.md](https://github.com/galaxy-codee/DataForge-2026/blob/main/RESEARCH_PAPERS.md) |
+| **Setup / run instructions** | [HOW_TO_RUN.md](https://github.com/galaxy-codee/DataForge-2026/blob/main/HOW_TO_RUN.md) |
+| **Source and license record** | [SOURCES_AND_LICENSES.md](https://github.com/galaxy-codee/DataForge-2026/blob/main/SOURCES_AND_LICENSES.md) |
+| **AI assistance disclosure** | [AI_DISCLOSURE.md](https://github.com/galaxy-codee/DataForge-2026/blob/main/AI_DISCLOSURE.md) |
+| **All links in one place** | [ACCESS_LINKS.md](https://github.com/galaxy-codee/DataForge-2026/blob/main/ACCESS_LINKS.md) |
+
+If the hosted GitHub Pages links above 404, use the no-setup mirror instead: `https://raw.githack.com/galaxy-codee/DataForge-2026/main/linear_attention_story.html` (swap the filename for the concept summary).
+
 ### What's in this repository
 
 | File | What it is |
@@ -12,6 +28,9 @@
 | `concept_summary.pdf` | The required one-page concept summary. ~1,400 words, two-column A4, single page. This is above the track's "approximately 500–950 words" recommendation — kept to one page as required, with a "why this matters now" section and a methodology section added for density; trim if a strict word cap turns out to matter more than page count. |
 | `concept_summary.html` | Source for the PDF above, kept so the PDF is reproducible. |
 | `README.md` | This file: claim, audience, objectives, architecture, evidence labelling, reproduction. |
+| `RESEARCH_PAPERS.md` | All 7 research papers used, what each supports, and citation-verification status. |
+| `HOW_TO_RUN.md` | Step-by-step instructions for opening the artifact, the concept summary, and every other deliverable. |
+| `ACCESS_LINKS.md` | Every public link for this submission, in one place. |
 | `SOURCES_AND_LICENSES.md` | Source and license record for all code, data, graphics, fonts, and reused components. |
 | `AI_DISCLOSURE.md` | AI assistance, code, data, and asset disclosure, plus citation-verification results. |
 | `LICENSE` | MIT license for the original work in this repository. |
