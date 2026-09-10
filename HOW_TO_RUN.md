@@ -1,6 +1,6 @@
 # How to run and view this submission
 
-Submission: **Where Memory Breaks — Linear Attention vs. Softmax Attention** · DataForge 2026, Pathway Track.
+Submission: **Where Memory Breaks — Linear Attention vs. Softmax Attention** · DataForge 2026, Pathway Track
 
 Nothing in this project needs to be installed, built, or compiled. There is no server, no dependencies to `pip install` or `npm install`, no dataset to download, and no API key. Everything runs client-side in a browser.
 
